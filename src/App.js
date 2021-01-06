@@ -1,26 +1,45 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect }  from 'react'
+import { ThemeProvider } from 'styled-components'
+import './App.css'
+import Routes from './config/router'
+import { Provider } from 'react-redux'
+import { store } from './config/store'
+import Header from '../src/components/header'
+import { useSelector } from 'react-redux'
+import { darkModeAction } from '../src/actions/config_action'
+import lightTheme from '../src/theme/light'
+import darkTheme from '../src/theme/dark'
+import Container from '../src/theme/components/Container'
+import { useDispatch } from 'react-redux'
+import './config/translations'
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+const AppMatch = () => {
+  return (
+    <Provider store={store}> 
+      <App /> 
+    </Provider>
+  )
+}
 
 function App() {
+    
+  const dispatch = useDispatch()
+  const config = useSelector(state => state.config)
+
+  useEffect(() => {
+    if (!config.darkMode) {
+      dispatch(darkModeAction(window.localStorage.getItem('theme')))
+    }
+  }, [config.darkMode, dispatch])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={config.darkMode === 'light' ? lightTheme : darkTheme}>
+    <Container>
+    <Header></Header>
+      <Routes></Routes>
+    </Container>
+  </ThemeProvider>
   );
 }
 
-export default App;
+export default AppMatch;
